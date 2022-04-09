@@ -12,8 +12,8 @@ import java.io.PrintWriter;
         description="Login Servlet Testing",
         urlPatterns = {"/LoginServlet"},
         initParams = {
-                @WebInitParam(name="user", value = "Pankaj"),
-                @WebInitParam(name="password", value ="Pankaj123")
+                @WebInitParam(name="user", value = "pankaj"),
+                @WebInitParam(name="password", value ="pa")
         }
 )
 public class LoginServlet extends HttpServlet {
@@ -23,22 +23,31 @@ public class LoginServlet extends HttpServlet {
         String pwd = req.getParameter("pwd");
         String userID = getServletConfig().getInitParameter("user");
         String password = getServletConfig().getInitParameter("password");
-
+        PrintWriter out = resp.getWriter();
+        Validation validation = new Validation();
         // UC3 : Validating name of the user
         ///String nameValidate = "^[A-Z][a-z]{10}";
 
         // UC4 : Validating password of the user
         ///String passwordValidate = "^(?=.*[0-9])(?=[^@#$%^&+=]*[@#$%^&+=][^@#$%^&+=]*$)(?=.*[a-z])(?=.*[A-Z]).{8,}$";
 
-        if(userID.equals(user)  && password.equals(pwd)) {
+        if (!validation.validateName(user)) {
+            RequestDispatcher rd = getServletContext().getRequestDispatcher("/login.html");
+            out.println("<font color = red> Name must be starts with UpperCaseLetter and required minimum 3 characters </font> ");
+            rd.include(req, resp);
+        }
+        else if (!validation.validatePassword(pwd)) {
+            RequestDispatcher rd = getServletContext().getRequestDispatcher("/login.html");
+            out.println("<font color = red> Password must contain 8 Characters atleast 1 UpperLetter 1 number,1 Special Character </font> ");
+            rd.include(req, resp);
+        }
+        else if(userID.equals(user)  && password.equals(pwd)) {
             req.setAttribute("user",user);
             req.getRequestDispatcher("loginSuccess.jsp").forward(req, resp);
         } else {
             RequestDispatcher rd = getServletContext().getRequestDispatcher("/login.html");
-            PrintWriter out  = resp.getWriter();
             out.println("<font color = red> Either username or password is wrong</font>");
             rd.include(req, resp);
         }
-
     }
 }
